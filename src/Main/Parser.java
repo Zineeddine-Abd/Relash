@@ -3,6 +3,7 @@ package Main;
 public class Parser {
 
     public static Object parse(String cmd, DBConfig config) {
+
         cmd = cmd.trim();
 
         if (cmd.toUpperCase().startsWith("CREATE TABLE")) {
