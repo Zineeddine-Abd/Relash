@@ -19,7 +19,6 @@ public class CreateTable {
 
     public void execute() {
         try {
-            File folder = new File(config.getDbPath());
 
             File tableFile = new File(config.getDbPath() + "/" + tableName + ".tbl");
 
