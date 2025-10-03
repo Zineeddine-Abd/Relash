@@ -17,6 +17,15 @@ public class Parser {
             }
 
             return new commandes.CreateTable(tableName, columns, config);
+
+        }else{
+
+            if (cmd.toUpperCase().startsWith("SELECT")) {
+                return new commandes.Select(cmd, config);
+            } else if (cmd.toUpperCase().startsWith("INSERT INTO")) {
+
+            }
+
         }
 
         if (cmd.equalsIgnoreCase("EXIT")) {
