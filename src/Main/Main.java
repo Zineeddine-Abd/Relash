@@ -7,6 +7,10 @@ public class Main {
         // Charger config
         DBConfig config = DBConfig.loadFromFile("config/dbconfig.json");
 
+        // Initialiser le gestionnaire disque
+        DiskManager diskManager = new DiskManager(config);
+        diskManager.Init();
+
         Scanner scanner = new Scanner(System.in);
         System.out.println("Relash is live. Tapez vos commandes (EXIT pour quitter)");
 
@@ -31,6 +35,8 @@ public class Main {
             }
         }
 
+        // Finaliser le gestionnaire disque
+        diskManager.Finish();
         scanner.close();
     }
 }
