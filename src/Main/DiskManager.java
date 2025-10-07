@@ -42,6 +42,7 @@ public class DiskManager {
 
     public PageId AllocPage() {
 
+        // Réutiliser une page libre si disponible
         if (!freePages.isEmpty()) {
             return freePages.remove(0);
         }
@@ -53,7 +54,6 @@ public class DiskManager {
                 File dataFile = new File(binDataPath + "/Data" + fileIdx + ".bin");
 
                 if (!dataFile.exists()) {
-
                     dataFile.createNewFile();
                     return new PageId(fileIdx, 0);
                 }
