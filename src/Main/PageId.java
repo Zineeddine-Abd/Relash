@@ -1,4 +1,4 @@
-package Main;
+package main;
 
 public class PageId {
     private int fileIdx;
@@ -33,8 +33,10 @@ public class PageId {
     @Override
     public boolean equals(Object obj) {
 
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
+        if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
 
         PageId pageId = (PageId) obj;
         return fileIdx == pageId.fileIdx && pageIdx == pageId.pageIdx;

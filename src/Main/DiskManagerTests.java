@@ -1,4 +1,4 @@
-package Main;
+package main;
 
 import java.io.File;
 import java.nio.ByteBuffer;
@@ -38,7 +38,7 @@ public class DiskManagerTests {
     public static void testAllocPage() {
         System.out.println("Test 2: AllocPage");
 
-        DBConfig config = new DBConfig("test_data", 4, 2,8);
+        DBConfig config = new DBConfig("test_data", 4, 2, 8);
         DiskManager dm = new DiskManager(config);
         dm.Init();
 

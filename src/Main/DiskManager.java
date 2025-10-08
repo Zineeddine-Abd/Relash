@@ -1,4 +1,4 @@
-package Main;
+package main;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -62,7 +62,7 @@ public class DiskManager {
                     }
 
                     continue;
-                }else{
+                } else {
                     dataFile.createNewFile();
                     return new PageId(fileIdx, 0);
                 }
@@ -77,7 +77,7 @@ public class DiskManager {
 
     public void ReadPage(PageId pageId, ByteBuffer buffer) {
         try {
-            String fileName = binDataPath + "/Data" + pageId.getFileIdx() + ".bin";
+            String fileName = binDataPath + "/data" + pageId.getFileIdx() + ".bin";
             File file = new File(fileName);
 
             if (!file.exists()) {
