@@ -42,7 +42,7 @@ public class DiskManager {
 
     public PageId AllocPage() {
 
-        // Réutiliser une page libre si disponible
+        // Réutiliser une page libre si disponible, en la supprimant de la liste des pages libres aussi
         if (!freePages.isEmpty()) {
             return freePages.remove(0);
         }
