@@ -3,18 +3,23 @@ package Main;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Properties;
 
 public class DBConfig {
     private final String dbpath;
     private final int pagesize;
     private final int dm_maxfilecount;
     private final int dm_maxpagesperfile;
+    private int bm_buffercount;
+    private String bm_policy;
 
     public DBConfig(String dbpath, int pagesize, int dm_maxfilecount, int dm_maxpagesperfile) {
         this.dbpath = dbpath;
         this.dm_maxpagesperfile = dm_maxpagesperfile;
         this.pagesize = pagesize;
         this.dm_maxfilecount = dm_maxfilecount;
+        this.bm_buffercount = bm_buffercount;
+        this.bm_policy = bm_policy;
     }
 
     public String getDbPath() {
@@ -31,6 +36,22 @@ public class DBConfig {
 
     public int getDmMaxPagesPerFile() {
         return dm_maxpagesperfile;
+    }
+
+    public int getBm_buffercount() {
+        return bm_buffercount;
+    }
+
+    public void setBm_buffercount(int bm_buffercount) {
+        this.bm_buffercount = bm_buffercount;
+    }
+
+    public String getBm_policy() {
+        return bm_policy;
+    }
+
+    public void setBm_policy(String bm_policy) {
+        this.bm_policy = bm_policy;
     }
 
     public static DBConfig loadFromFile(String filename) {
