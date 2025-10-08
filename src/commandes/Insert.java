@@ -3,7 +3,7 @@ package commandes;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import main.DBConfig;
+import Main.DBConfig;
 
 public class Insert {
     private String tableName;

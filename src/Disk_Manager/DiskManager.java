@@ -1,4 +1,6 @@
-package main;
+package Disk_Manager;
+
+import Main.DBConfig;
 
 import java.io.*;
 import java.nio.ByteBuffer;

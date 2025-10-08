@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import main.DBConfig;
+import Main.DBConfig;
 
 public class CreateTable {
     private String tableName;

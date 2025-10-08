@@ -1,4 +1,6 @@
-package main;
+package Main;
+
+import Disk_Manager.DiskManager;
 
 import java.util.Scanner;
 

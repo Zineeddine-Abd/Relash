@@ -4,7 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
-import main.DBConfig;
+import Main.DBConfig;
 
 public class Select {
     private String tableName;
