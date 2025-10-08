@@ -18,7 +18,7 @@ public class Parser {
 
             return new commandes.CreateTable(tableName, columns, config);
 
-        }else{
+        } else {
 
             if (cmd.toUpperCase().startsWith("SELECT")) {
                 return new commandes.Select(cmd, config);
