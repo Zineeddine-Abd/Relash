@@ -1,4 +1,4 @@
-package Main;
+package DiskManager;
 
 public class PageId {
   private int fileIdx;

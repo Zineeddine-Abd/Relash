@@ -1,4 +1,4 @@
-package Main;
+package DiskManager;
 
 import java.io.*;
 import java.nio.ByteBuffer;
