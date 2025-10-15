@@ -1,3 +1,5 @@
 {
-  "dbpath": "data"
+  "dbpath": "data",
+  "pagesize": 4096,
+  "dm_maxfilecount": 4
 }
