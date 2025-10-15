@@ -1,4 +1,4 @@
-package DiskManager;
+package Main;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import DiskManager.PageId;
 
 public class DiskManager {
 
@@ -42,27 +43,30 @@ public class DiskManager {
 
     public PageId AllocPage() {
 
+        // Réutiliser une page libre si disponible
         if (!freePages.isEmpty()) {
             return freePages.remove(0);
         }
 
         try {
-            // Trouver le fichier approprié
+
             for (int fileIdx = 0; fileIdx < config.getDmMaxFileCount(); fileIdx++) {
 
                 File dataFile = new File(binDataPath + "/Data" + fileIdx + ".bin");
 
-                if (!dataFile.exists()) {
+                if (dataFile.exists()) {
+                    long fileSize = dataFile.length();
+                    int currentPages = (int) (fileSize / config.getPageSize());
 
+                    if (currentPages < config.getDmMaxPagesPerFile()) {
+                        return new PageId(fileIdx, currentPages);
+                    }
+
+                    continue;
+                }else{
                     dataFile.createNewFile();
                     return new PageId(fileIdx, 0);
                 }
-
-                // Sinon Calculer le nombre de pages actuelles dans le fichier
-                long fileSize = dataFile.length();
-                int currentPages = (int) (fileSize / config.getPageSize());
-
-                return new PageId(fileIdx, currentPages);
             }
 
             throw new RuntimeException("Nombre maximum de fichiers atteint");
