@@ -1,5 +1,6 @@
 package DiskManager;
-import Main.*;
+
+import Main.DBConfig;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -8,7 +9,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import DiskManager.PageId;
 
 public class DiskManager {
 
@@ -64,7 +64,7 @@ public class DiskManager {
                     }
 
                     continue;
-                }else{
+                } else {
                     dataFile.createNewFile();
                     return new PageId(fileIdx, 0);
                 }
