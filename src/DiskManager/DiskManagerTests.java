@@ -1,6 +1,5 @@
 package DiskManager;
-
-import Main.DBConfig;
+import Main.*;
 
 import java.io.File;
 import java.nio.ByteBuffer;
@@ -22,7 +21,7 @@ public class DiskManagerTests {
     public static void testInit() {
         System.out.println("Test 1: Init");
 
-        DBConfig config = new DBConfig("test_data", 4, 2);
+        DBConfig config = new DBConfig("test_data", 4, 2, 8);
         DiskManager dm = new DiskManager(config);
         dm.Init();
 
@@ -40,7 +39,7 @@ public class DiskManagerTests {
     public static void testAllocPage() {
         System.out.println("Test 2: AllocPage");
 
-        DBConfig config = new DBConfig("test_data", 4, 2);
+        DBConfig config = new DBConfig("test_data", 4, 2,8);
         DiskManager dm = new DiskManager(config);
         dm.Init();
 
@@ -65,7 +64,7 @@ public class DiskManagerTests {
     public static void testWriteAndReadPage() {
         System.out.println("Test 3: Write et Read Page");
 
-        DBConfig config = new DBConfig("test_data", 4, 2);
+        DBConfig config = new DBConfig("test_data", 4, 2, 8);
         DiskManager dm = new DiskManager(config);
         dm.Init();
 
@@ -106,7 +105,7 @@ public class DiskManagerTests {
     public static void testDeallocPage() {
         System.out.println("Test 4: DeallocPage");
 
-        DBConfig config = new DBConfig("test_data", 4, 2);
+        DBConfig config = new DBConfig("test_data", 4, 2, 8);
         DiskManager dm = new DiskManager(config);
         dm.Init();
 
@@ -132,7 +131,7 @@ public class DiskManagerTests {
     public static void testPersistence() {
         System.out.println("Test 5: Persistence (Init/Finish)");
 
-        DBConfig config = new DBConfig("test_data", 4, 2);
+        DBConfig config = new DBConfig("test_data", 4, 2, 8);
 
         // Premier cycle: écrire des données
         DiskManager dm1 = new DiskManager(config);
