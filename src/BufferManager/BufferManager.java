@@ -72,6 +72,26 @@ public class BufferManager {
         }
     }
 
+    public void FreePage(PageId pageId, boolean valdirty) {
+        synchronized (this) {
+            Integer bufferIndex = pageToBufferMap.get(pageId);
+            if (bufferIndex != null) {
+                Buffer buffer = bufferPool[bufferIndex];
+                buffer.decrementPin_count();
+                if (valdirty) {
+                    buffer.setDirty(true);
+                }
+                // Update access time for replacement policy
+                if (currentPolicy.equals("LRU")) {
+                    // For LRU, we don't update time on FreePage
+                } else if (currentPolicy.equals("MRU")) {
+                    // For MRU, we could update time, but typically MRU
+                    // considers access time from GetPage
+                }
+            }
+        }
+    }
+
     public void FlushBuffers() {
         synchronized (this) {
             // Write all dirty pages to disk
@@ -121,6 +141,22 @@ public class BufferManager {
         } else { // MRU
             return findMRUBuffer(candidates);
         }
+    }
+
+    private int findMRUBuffer(List<Integer> candidates) {
+        int mruIndex = candidates.get(0);
+        long newestTime = bufferPool[mruIndex].getLastAccessTime();
+
+        for (int i = 1; i < candidates.size(); i++) {
+            int candidateIndex = candidates.get(i);
+            long candidateTime = bufferPool[candidateIndex].getLastAccessTime();
+            if (candidateTime > newestTime) {
+                newestTime = candidateTime;
+                mruIndex = candidateIndex;
+            }
+        }
+
+        return mruIndex;
     }
 
     public String getCurrentPolicy() {
