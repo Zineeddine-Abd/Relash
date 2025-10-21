@@ -1,8 +1,8 @@
 package BufferManager;
 
-import Main.DBConfig;
 import DiskManager.DiskManager;
 import DiskManager.PageId;
+import Main.DBConfig;
 import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -196,5 +196,24 @@ public class BufferManager {
 
     public int getLoadedPageCount() {
         return pageToBufferMap.size();
+    }
+
+    public String getBufferPoolStatus() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Buffer Pool Status (Policy: ").append(currentPolicy).append(")\n");
+        for (int i = 0; i < bufferPool.length; i++) {
+            Buffer buffer = bufferPool[i];
+            sb.append("Buffer ").append(i).append(": ");
+            if (buffer.isValid()) {
+                sb.append("PageId=").append(buffer.getPageId())
+                        .append(", PinCount=").append(buffer.getPin_count())
+                        .append(", Dirty=").append(buffer.isDirty())
+                        .append(", LastAccess=").append(buffer.getLastAccessTime());
+            } else {
+                sb.append("EMPTY");
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
     }
 }
