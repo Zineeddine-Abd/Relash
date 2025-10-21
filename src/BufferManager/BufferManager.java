@@ -92,6 +92,17 @@ public class BufferManager {
         }
     }
 
+    public void SetCurrentReplacementPolicy(String policy) {
+        synchronized (this) {
+            if (policy.equals("LRU") || policy.equals("MRU")) {
+                this.currentPolicy = policy;
+            } else {
+                throw new IllegalArgumentException("Invalid policy: " + policy +
+                        ". Only LRU and MRU are supported.");
+            }
+        }
+    }
+
     public void FlushBuffers() {
         synchronized (this) {
             // Write all dirty pages to disk
@@ -141,6 +152,22 @@ public class BufferManager {
         } else { // MRU
             return findMRUBuffer(candidates);
         }
+    }
+
+    private int findLRUBuffer(List<Integer> candidates) {
+        int lruIndex = candidates.get(0);
+        long oldestTime = bufferPool[lruIndex].getLastAccessTime();
+
+        for (int i = 1; i < candidates.size(); i++) {
+            int candidateIndex = candidates.get(i);
+            long candidateTime = bufferPool[candidateIndex].getLastAccessTime();
+            if (candidateTime < oldestTime) {
+                oldestTime = candidateTime;
+                lruIndex = candidateIndex;
+            }
+        }
+
+        return lruIndex;
     }
 
     private int findMRUBuffer(List<Integer> candidates) {
