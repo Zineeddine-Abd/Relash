@@ -1,4 +1,4 @@
-package Disk_Manager;
+package DiskManager;
 
 import Main.DBConfig;
 

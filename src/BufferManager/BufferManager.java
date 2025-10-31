@@ -1,8 +1,8 @@
 package BufferManager;
 
+import Main.DBConfig;
 import DiskManager.DiskManager;
 import DiskManager.PageId;
-import Main.DBConfig;
 import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,6 +14,7 @@ public class BufferManager {
     private Map<PageId, Integer> pageToBufferMap; // Maps PageId to buffer index
     private String currentPolicy;
     private long currentTime; // For LRU/MRU timestamp
+
 
     public BufferManager(DBConfig config, DiskManager diskManager) {
         this.config = config;
@@ -65,7 +66,7 @@ public class BufferManager {
             targetBuffer.incrementPin_count();
             targetBuffer.setLastAccessTime(currentTime);
 
-            // Update mapping
+            // Update the mapping
             pageToBufferMap.put(pageId, targetBufferIndex);
 
             return targetBuffer.getData();
@@ -81,13 +82,6 @@ public class BufferManager {
                 if (valdirty) {
                     buffer.setDirty(true);
                 }
-                // Update access time for replacement policy
-                if (currentPolicy.equals("LRU")) {
-                    // For LRU, we don't update time on FreePage
-                } else if (currentPolicy.equals("MRU")) {
-                    // For MRU, we could update time, but typically MRU
-                    // considers access time from GetPage
-                }
             }
         }
     }
@@ -98,11 +92,12 @@ public class BufferManager {
                 this.currentPolicy = policy;
             } else {
                 throw new IllegalArgumentException("Invalid policy: " + policy +
-                        ". Only LRU and MRU are supported.");
+                        "Que LRU et MRU are Sont valides");
             }
         }
     }
 
+    // Flushes all dirty pages to disk and resets all buffers.
     public void FlushBuffers() {
         synchronized (this) {
             // Write all dirty pages to disk
@@ -111,16 +106,12 @@ public class BufferManager {
                     diskManager.WritePage(buffer.getPageId(), buffer.getData());
                 }
             }
-
             // Reset all buffers
             for (Buffer buffer : bufferPool) {
                 buffer.reset();
             }
-
-            // Clear page mapping
+            // Clear
             pageToBufferMap.clear();
-
-            // Reset time counter
             currentTime = 0;
         }
     }
@@ -132,7 +123,6 @@ public class BufferManager {
                 return i;
             }
         }
-
         // No empty buffer, need to apply replacement policy
         // Only consider unpinned buffers
         List<Integer> candidates = new ArrayList<>();
@@ -153,6 +143,7 @@ public class BufferManager {
             return findMRUBuffer(candidates);
         }
     }
+
 
     private int findLRUBuffer(List<Integer> candidates) {
         int lruIndex = candidates.get(0);
@@ -186,17 +177,10 @@ public class BufferManager {
         return mruIndex;
     }
 
-    public String getCurrentPolicy() {
-        return currentPolicy;
-    }
+    public String getCurrentPolicy() { return currentPolicy; }
+    public int getBufferPoolSize() { return bufferPool.length; }
+    public int getLoadedPageCount() { return pageToBufferMap.size(); }
 
-    public int getBufferPoolSize() {
-        return bufferPool.length;
-    }
-
-    public int getLoadedPageCount() {
-        return pageToBufferMap.size();
-    }
 
     public String getBufferPoolStatus() {
         StringBuilder sb = new StringBuilder();
