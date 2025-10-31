@@ -1,4 +1,4 @@
-package DiskManager;
+package Disk_Manager;
 
 import Main.DBConfig;
 
@@ -30,7 +30,8 @@ public class DiskManagerTests {
         System.out.println("\n--- Tous les tests terminés ---");
     }
 
-    // Pour nettoyer l'environnement de test (supprimer les fichiers et les dossier crees)
+    // Pour nettoyer l'environnement de test (supprimer les fichiers et les dossier
+    // crees)
     private static void cleanup() {
         try {
             Path path = Paths.get(TEST_DB_PATH);
@@ -44,7 +45,6 @@ public class DiskManagerTests {
             System.err.println("Erreur lors du nettoyage: " + e.getMessage());
         }
     }
-
 
     public static void testInit() {
         System.out.println("Test 1: Init");

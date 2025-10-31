@@ -1,4 +1,4 @@
-package DiskManager;
+package Disk_Manager;
 
 import Main.DBConfig;
 
@@ -19,7 +19,7 @@ public class DiskManager {
     public DiskManager(DBConfig config) {
         this.config = config;
         this.freePages = new ArrayList<>();
-        this.binDataPath = config.getDbPath();
+        this.binDataPath = config.getDbPath() + File.separator + "BinData";
     }
 
     public void Init() {
@@ -28,50 +28,41 @@ public class DiskManager {
             if (!Files.exists(binDataDir)) {
                 Files.createDirectories(binDataDir);
             }
-
-            // Charger la liste des pages libres depuis les fichiers existants
             loadFreePages();
-
         } catch (IOException e) {
             System.err.println("Erreur initialisation DiskManager: " + e.getMessage());
         }
     }
 
     public void Finish() {
-
         saveFreePages();
     }
 
     public PageId AllocPage() {
-
-        // Réutiliser une page libre si disponible
         if (!freePages.isEmpty()) {
             return freePages.remove(0);
         }
 
         try {
-
             for (int fileIdx = 0; fileIdx < config.getDmMaxFileCount(); fileIdx++) {
+                File dataFile = new File(binDataPath + File.separator + "Data" + fileIdx + ".bin");
 
-                File dataFile = new File(binDataPath + "/Data" + fileIdx + ".bin");
-
-                if (dataFile.exists()) {
-                    long fileSize = dataFile.length();
-                    int currentPages = (int) (fileSize / config.getPageSize());
-
-                    if (currentPages < config.getDmMaxPagesPerFile()) {
-                        return new PageId(fileIdx, currentPages);
-                    }
-
-                    continue;
-                } else {
+                if (!dataFile.exists()) {
                     dataFile.createNewFile();
-                    return new PageId(fileIdx, 0);
+                }
+
+                long fileSize = dataFile.length();
+                int currentPages = (int) (fileSize / config.getPageSize());
+
+                if (currentPages < config.getDmMaxPagesPerFile()) {
+
+                    try (RandomAccessFile raf = new RandomAccessFile(dataFile, "rw")) {
+                        raf.setLength(fileSize + config.getPageSize());
+                    }
+                    return new PageId(fileIdx, currentPages);
                 }
             }
-
             throw new RuntimeException("Nombre maximum de fichiers atteint");
-
         } catch (IOException e) {
             throw new RuntimeException("Erreur allocation page: " + e.getMessage());
         }
@@ -79,23 +70,37 @@ public class DiskManager {
 
     public void ReadPage(PageId pageId, ByteBuffer buffer) {
         try {
-            String fileName = binDataPath + "/Data" + pageId.getFileIdx() + ".bin";
+            String fileName = binDataPath + File.separator + "Data" + pageId.getFileIdx() + ".bin";
             File file = new File(fileName);
 
             if (!file.exists()) {
-                throw new RuntimeException("Fichier " + fileName + " n'existe pas");
+                // Si le fichier n'existe pas, c'est une page vide, on la remplit de zéros
+                buffer.clear();
+                buffer.put(new byte[config.getPageSize()]);
+                buffer.flip();
+                return;
             }
 
             RandomAccessFile raf = new RandomAccessFile(file, "r");
             long offset = (long) pageId.getPageIdx() * config.getPageSize();
 
+            // Vérifier si l'offset est au-delà de la fin du fichier (page "logiquement"
+            // allouée mais jamais écrite)
+            if (offset >= raf.length()) {
+                buffer.clear();
+                buffer.put(new byte[config.getPageSize()]);
+                buffer.flip();
+                raf.close();
+                return;
+            }
+
             raf.seek(offset);
             byte[] data = new byte[config.getPageSize()];
             int bytesRead = raf.read(data);
+            int startIndex = (bytesRead == -1) ? 0 : bytesRead;
 
-            if (bytesRead < config.getPageSize()) {
-                // Remplir le reste avec des 0
-                for (int i = bytesRead; i < config.getPageSize(); i++) {
+            if (startIndex < config.getPageSize()) {
+                for (int i = startIndex; i < config.getPageSize(); i++) {
                     data[i] = 0;
                 }
             }
@@ -103,9 +108,7 @@ public class DiskManager {
             buffer.clear();
             buffer.put(data);
             buffer.flip();
-
             raf.close();
-
         } catch (IOException e) {
             throw new RuntimeException("Erreur lecture page: " + e.getMessage());
         }
@@ -122,7 +125,6 @@ public class DiskManager {
 
             RandomAccessFile raf = new RandomAccessFile(file, "rw");
             long offset = (long) pageId.getPageIdx() * config.getPageSize();
-
             raf.seek(offset);
 
             byte[] data = new byte[config.getPageSize()];
@@ -138,14 +140,12 @@ public class DiskManager {
     }
 
     public void DeallocPage(PageId pageId) {
-        // Ajouter la page à la liste des pages libres
         if (!freePages.contains(pageId)) {
             freePages.add(pageId);
         }
     }
 
     private void loadFreePages() {
-        // Charger la liste des pages libres depuis un fichier de métadonnées
         File metaFile = new File(binDataPath + "/freepages.meta");
         if (!metaFile.exists()) {
             return;
@@ -167,7 +167,6 @@ public class DiskManager {
     }
 
     private void saveFreePages() {
-        // Sauvegarder la liste des pages libres dans un fichier de métadonnées
         File metaFile = new File(binDataPath + "/freepages.meta");
 
         try (FileWriter writer = new FileWriter(metaFile)) {
