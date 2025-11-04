@@ -1,9 +1,8 @@
-package Buffer_Manager;
+package BufferManager;
 
-import Disk_Manager.DiskManager;
-import Disk_Manager.PageId;
+import DiskManager.DiskManager;
+import DiskManager.PageId;
 import Main.DBConfig;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
