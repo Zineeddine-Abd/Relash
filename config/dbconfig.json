@@ -1,5 +1,8 @@
 {
   "dbpath": "data",
   "pagesize": 4096,
-  "dm_maxfilecount": 4
+  "dm_maxfilecount": 4,
+  "dm_maxpagesperfile": 8,
+  "bm_buffercount": 10,
+  "bm_policy": "LRU"
 }
