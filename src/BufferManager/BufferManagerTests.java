@@ -64,7 +64,7 @@ public class BufferManagerTests {
         BufferManager bm = new BufferManager(config, dm);
 
         PageId pageId = dm.AllocPage();
-        ByteBuffer writeBuffer = ByteBuffer.wrap(new byte[]{'A', 'B', 'C', 'D'});
+        ByteBuffer writeBuffer = ByteBuffer.wrap(new byte[] { 'A', 'B', 'C', 'D' });
         dm.WritePage(pageId, writeBuffer);
 
         ByteBuffer readBuffer = bm.GetPage(pageId);
@@ -145,11 +145,15 @@ public class BufferManagerTests {
         PageId p2 = dm.AllocPage();
         PageId p3 = dm.AllocPage();
 
-        bm.GetPage(p1); bm.FreePage(p1, false); // Accès 1
-        bm.GetPage(p2); bm.FreePage(p2, false); // Accès 2
-        bm.GetPage(p3); bm.FreePage(p3, false); // Accès 3
+        bm.GetPage(p1);
+        bm.FreePage(p1, false); // Accès 1
+        bm.GetPage(p2);
+        bm.FreePage(p2, false); // Accès 2
+        bm.GetPage(p3);
+        bm.FreePage(p3, false); // Accès 3
 
-        bm.GetPage(p1); bm.FreePage(p1, false); // p1 est maintenant le plus récent
+        bm.GetPage(p1);
+        bm.FreePage(p1, false); // p1 est maintenant le plus récent
 
         PageId p4 = dm.AllocPage();
         bm.GetPage(p4); // Devrait remplacer p2 (le moins récemment utilise)
@@ -174,11 +178,15 @@ public class BufferManagerTests {
         PageId p2 = dm.AllocPage();
         PageId p3 = dm.AllocPage();
 
-        bm.GetPage(p1); bm.FreePage(p1, false);
-        bm.GetPage(p2); bm.FreePage(p2, false);
-        bm.GetPage(p3); bm.FreePage(p3, false);
+        bm.GetPage(p1);
+        bm.FreePage(p1, false);
+        bm.GetPage(p2);
+        bm.FreePage(p2, false);
+        bm.GetPage(p3);
+        bm.FreePage(p3, false);
 
-        bm.GetPage(p1); bm.FreePage(p1, false); // p1 est maintenant le plus récent
+        bm.GetPage(p1);
+        bm.FreePage(p1, false); // p1 est maintenant le plus récent
 
         PageId p4 = dm.AllocPage();
         bm.GetPage(p4); // Devrait remplacer p1 (le plus récemment utilisé)
@@ -200,7 +208,7 @@ public class BufferManagerTests {
 
         PageId pageId = dm.AllocPage();
         ByteBuffer buffer = bm.GetPage(pageId);
-        buffer.put(0, (byte)'X'); // Modifier la page
+        buffer.put(0, (byte) 'X'); // Modifier la page
         bm.FreePage(pageId, true); // Marquer comme dirty
 
         bm.FlushBuffers(); // Doit écrire 'X' sur le disque
