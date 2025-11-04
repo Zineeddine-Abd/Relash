@@ -3,8 +3,7 @@ package BufferManager;
 import DiskManager.PageId;
 import java.nio.ByteBuffer;
 
-
- // Represents a single buffer frame in the buffer pool.
+// Represents a single buffer frame in the buffer pool.
 
 public class Buffer {
     private PageId pageId;
@@ -24,29 +23,59 @@ public class Buffer {
     }
 
     // Getters and Setters
-    public PageId getPageId() { return pageId; }
-    public void setPageId(PageId pageId) { this.pageId = pageId; }
+    public PageId getPageId() {
+        return pageId;
+    }
 
-    public ByteBuffer getData() { return data; }
+    public void setPageId(PageId pageId) {
+        this.pageId = pageId;
+    }
 
-    public int getPin_count() { return pin_count; }
-    public void incrementPin_count() { this.pin_count++; }
+    public ByteBuffer getData() {
+        return data;
+    }
+
+    public int getPin_count() {
+        return pin_count;
+    }
+
+    public void incrementPin_count() {
+        this.pin_count++;
+    }
+
     public void decrementPin_count() {
         if (this.pin_count > 0) {
             this.pin_count--;
         }
     }
 
-    public boolean isDirty() { return dirty; }
-    public void setDirty(boolean dirty) { this.dirty = dirty; }
+    public boolean isDirty() {
+        return dirty;
+    }
 
-    public long getLastAccessTime() { return lastAccessTime; }
-    public void setLastAccessTime(long lastAccessTime) { this.lastAccessTime = lastAccessTime; }
+    public void setDirty(boolean dirty) {
+        this.dirty = dirty;
+    }
 
-    public boolean isValid() { return valid; }
-    public void setValid(boolean valid) { this.valid = valid; }
+    public long getLastAccessTime() {
+        return lastAccessTime;
+    }
 
-    public boolean isPinned() { return pin_count > 0; }
+    public void setLastAccessTime(long lastAccessTime) {
+        this.lastAccessTime = lastAccessTime;
+    }
+
+    public boolean isValid() {
+        return valid;
+    }
+
+    public void setValid(boolean valid) {
+        this.valid = valid;
+    }
+
+    public boolean isPinned() {
+        return pin_count > 0;
+    }
 
     public void reset() {
         this.pageId = null;
@@ -54,6 +83,6 @@ public class Buffer {
         this.dirty = false;
         this.lastAccessTime = 0;
         this.valid = false;
-        this.data.clear();
+        this.data.clear(); // pos=0 and lim=capacity.
     }
 }

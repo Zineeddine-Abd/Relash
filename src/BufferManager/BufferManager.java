@@ -15,7 +15,6 @@ public class BufferManager {
     private String currentPolicy;
     private long currentTime; // For LRU/MRU timestamp
 
-
     public BufferManager(DBConfig config, DiskManager diskManager) {
         this.config = config;
         this.diskManager = diskManager;
@@ -40,7 +39,7 @@ public class BufferManager {
                 Buffer buffer = bufferPool[bufferIndex];
                 buffer.incrementPin_count();
                 buffer.setLastAccessTime(currentTime);
-                return buffer.getData();
+                return buffer.getData().position(0); // Reset position
             }
 
             // Page not in buffer pool, need to load it
@@ -59,17 +58,16 @@ public class BufferManager {
             }
 
             // Load new page from disk
-            targetBuffer.reset();
-            diskManager.ReadPage(pageId, targetBuffer.getData());
+            targetBuffer.reset(); // recycling the buffer for improved performance
+            diskManager.ReadPage(pageId, targetBuffer.getData()); // Load data into buffer
             targetBuffer.setPageId(pageId);
-            targetBuffer.setValid(true);
+            targetBuffer.setValid(true); // indicate that buffer now holds valid data
             targetBuffer.incrementPin_count();
             targetBuffer.setLastAccessTime(currentTime);
 
             // Update the mapping
             pageToBufferMap.put(pageId, targetBufferIndex);
-
-            return targetBuffer.getData();
+            return targetBuffer.getData().position(0); // Reset position
         }
     }
 
@@ -144,7 +142,6 @@ public class BufferManager {
         }
     }
 
-
     private int findLRUBuffer(List<Integer> candidates) {
         int lruIndex = candidates.get(0);
         long oldestTime = bufferPool[lruIndex].getLastAccessTime();
@@ -177,10 +174,17 @@ public class BufferManager {
         return mruIndex;
     }
 
-    public String getCurrentPolicy() { return currentPolicy; }
-    public int getBufferPoolSize() { return bufferPool.length; }
-    public int getLoadedPageCount() { return pageToBufferMap.size(); }
+    public String getCurrentPolicy() {
+        return currentPolicy;
+    }
 
+    public int getBufferPoolSize() {
+        return bufferPool.length;
+    }
+
+    public int getLoadedPageCount() {
+        return pageToBufferMap.size();
+    }
 
     public String getBufferPoolStatus() {
         StringBuilder sb = new StringBuilder();
