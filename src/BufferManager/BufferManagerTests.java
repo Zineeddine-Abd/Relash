@@ -3,7 +3,6 @@ package BufferManager;
 import DiskManager.DiskManager;
 import DiskManager.PageId;
 import Main.DBConfig;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -20,7 +19,7 @@ public class BufferManagerTests {
 
         System.out.println("--- Tests BufferManager ---\n");
 
-        cleanup();
+        
 
         testLoadsFromDisk();
         testReturnsExistingPage();
@@ -57,6 +56,7 @@ public class BufferManagerTests {
 
     public static void testLoadsFromDisk() {
         System.out.println("Test 1: GetPage charge une page depuis le disque");
+        cleanup();
         DBConfig config = new DBConfig(TEST_DB_PATH, 4, 2, 8, 3, "LRU");
         setupTestEnv(config);
         DiskManager dm = new DiskManager(config);
@@ -83,6 +83,7 @@ public class BufferManagerTests {
 
     public static void testReturnsExistingPage() {
         System.out.println("Test 2: GetPage retourne une page déja en memoire sans lire le disque");
+        cleanup();
         DBConfig config = new DBConfig(TEST_DB_PATH, 4, 2, 8, 3, "LRU");
         setupTestEnv(config);
         DiskManager dm = new DiskManager(config);
@@ -105,6 +106,7 @@ public class BufferManagerTests {
 
     public static void testFreePage_And_Dirty() {
         System.out.println("Test 3: FreePage et le flag dirty");
+        cleanup();
         DBConfig config = new DBConfig(TEST_DB_PATH, 4, 2, 8, 3, "LRU");
         setupTestEnv(config);
         DiskManager dm = new DiskManager(config);
@@ -132,6 +134,7 @@ public class BufferManagerTests {
 
     public static void testLRU_ReplacementPolicy() {
         System.out.println("Test 4: Politique de remplacement LRU");
+        cleanup();
         DBConfig config = new DBConfig(TEST_DB_PATH, 4, 2, 8, 3, "LRU"); // 3 buffers
         setupTestEnv(config);
         DiskManager dm = new DiskManager(config);
@@ -163,6 +166,7 @@ public class BufferManagerTests {
 
     public static void testMRU_ReplacementPolicy() {
         System.out.println("Test 5: Politique de remplacement MRU");
+        cleanup();
         DBConfig config = new DBConfig(TEST_DB_PATH, 4, 2, 8, 3, "MRU"); // 3 buffers
         setupTestEnv(config);
         DiskManager dm = new DiskManager(config);
@@ -195,6 +199,7 @@ public class BufferManagerTests {
 
     public static void testFlushBuffers() {
         System.out.println("Test 6: FlushBuffers ecrit les pages sales");
+        cleanup();
         DBConfig config = new DBConfig(TEST_DB_PATH, 4, 2, 8, 3, "LRU");
         setupTestEnv(config);
         DiskManager dm = new DiskManager(config);
@@ -222,6 +227,7 @@ public class BufferManagerTests {
 
     public static void testPinningPreventsReplacement() {
         System.out.println("Test 7: Le pinning empeche le remplacement");
+        cleanup();
         DBConfig config = new DBConfig(TEST_DB_PATH, 4, 2, 8, 2, "LRU"); // 2 buffers
         setupTestEnv(config);
         DiskManager dm = new DiskManager(config);
