@@ -190,11 +190,4 @@ public class Relation {
     Relation relation = (Relation) obj;
     return relationName.equals(relation.relationName) && Arrays.equals(columns, relation.columns);
   }
-
-  @Override
-  public int hashCode() {
-    int result = relationName.hashCode();
-    result = 31 * result + Arrays.hashCode(columns);
-    return result;
-  }
 }

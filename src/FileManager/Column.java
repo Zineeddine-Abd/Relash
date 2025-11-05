@@ -73,13 +73,4 @@ public class Column {
         columnName.equals(column.columnName) &&
         columnType == column.columnType;
   }
-
-  @Override
-  public int hashCode() {
-    int result = columnName.hashCode();
-    result = 31 * result + columnType.hashCode();
-    result = 31 * result + sizeInBytes;
-    return result;
-  }
-
 }

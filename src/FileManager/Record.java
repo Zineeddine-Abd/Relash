@@ -44,9 +44,4 @@ public class Record {
       return false;
     return Arrays.equals(values, ((Record) obj).values);
   }
-
-  @Override
-  public int hashCode() {
-    return Arrays.hashCode(values);
-  }
 }
