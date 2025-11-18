@@ -1,144 +1,141 @@
 package FileManager;
 
+import BufferManager.BufferManager;
+import DiskManager.DiskManager;
+import DiskManager.PageId;
+import Main.DBConfig;
+
+import java.io.File;
+import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Comparator;
+import java.util.List;
 
 public class RelationTests {
 
+  private static final String TEST_DB_PATH = "test_tp5_data";
+  private static DBConfig config;
+  private static DiskManager dm;
+  private static BufferManager bm;
+
+  private static void setup() {
+    cleanup();
+    config = new DBConfig(TEST_DB_PATH, 1024, 4, 8, 5, "LRU");
+    dm = new DiskManager(config);
+    dm.Init();
+    bm = new BufferManager(config, dm);
+  }
+
+  private static void cleanup() {
+    try {
+      if (bm != null)
+        bm.FlushBuffers();
+      if (dm != null)
+        dm.Finish();
+
+      Path path = Paths.get(TEST_DB_PATH);
+      if (Files.exists(path)) {
+        Files.walk(path)
+            .sorted(Comparator.reverseOrder())
+            .map(Path::toFile)
+            .forEach(File::delete);
+      }
+    } catch (IOException e) {
+      System.err.println("Erreur lors du nettoyage: " + e.getMessage());
+    }
+  }
+
   public static void main(String[] args) {
-    System.out.println("=== TP4 Buffer Operations Tests ===\n");
+    System.out.println("=== TP5 Relation/HeapFile Tests ===\n");
+    setup();
 
-    testIntFloat();
-    testChar();
-    testVarchar();
-    testMixedTypes();
-    testMultipleRecords();
+    testInsertAndGetAll();
+    testDeleteRecord();
 
-    System.out.println("\n=== All tests passed ===");
+    cleanup();
+    System.out.println("\n=== TP5 Tests Passed ===");
   }
 
-  private static void testIntFloat() {
-    System.out.println("Test 1: INT and FLOAT types");
+  public static void testInsertAndGetAll() {
+    System.out.println("Test 1: InsertRecord et GetAllRecords");
 
-    Column[] cols = { new Column("id", ColumnType.INT), new Column("price", ColumnType.FLOAT) };
-    Relation rel = new Relation("Products", cols);
+    // 1. Allouer une Header Page pour notre relation
+    PageId headerPageId = dm.AllocPage();
+    // Initialiser la Header Page (listes vides)
+    ByteBuffer headerBuf = bm.GetPage(headerPageId);
+    headerBuf.putInt(0, -1); // Free Head FileIdx
+    headerBuf.putInt(4, -1); // Free Head PageIdx
+    headerBuf.putInt(8, -1); // Full Head FileIdx
+    headerBuf.putInt(12, -1); // Full Head PageIdx
+    bm.FreePage(headerPageId, true);
 
-    Record original = new Record(new Object[] { 123, 45.67f });
-    ByteBuffer buffer = ByteBuffer.allocate(1024);
+    // 2. Definir le schéma et créer la Relation
+    Column[] cols = { new Column("id", ColumnType.INT), new Column("name", ColumnType.VARCHAR, 20) };
+    Relation rel = new Relation("Users", cols, config, dm, bm, headerPageId);
 
-    rel.writeRecordToBuffer(original, buffer, 0);
+    // 3. Inserer des records
+    Record r1 = new Record(new Object[] { 1, "Alice" });
+    Record r2 = new Record(new Object[] { 2, "Bob" });
+    Record r3 = new Record(new Object[] { 3, "Charlie" });
 
-    Record read = new Record(2);
-    rel.readFromBuffer(read, buffer, 0);
+    RecordId rid1 = rel.InsertRecord(r1);
+    RecordId rid2 = rel.InsertRecord(r2);
+    RecordId rid3 = rel.InsertRecord(r3);
 
-    assert read.getValue(0).equals(123) : "INT value mismatch";
-    assert Math.abs((Float) read.getValue(1) - 45.67f) < 0.001 : "FLOAT value mismatch";
+    System.out.println("Inséré: " + rid1);
+    System.out.println("Inséré: " + rid2);
+    System.out.println("Inséré: " + rid3);
 
-    System.out.println("✓ INT/FLOAT write-read successful");
-    System.out.println("  Original: " + original);
-    System.out.println("  Read:     " + read + "\n");
+    // 4. Recupérer tous les records
+    List<Record> all = rel.GetAllRecords();
+    System.out.println("GetAllRecords a trouvé: " + all.size() + " records");
+
+    assert all.size() == 3 : "Erreur: Nombre de records incorrect";
+    assert all.get(0).equals(r1) || all.get(1).equals(r1) || all.get(2).equals(r1) : "Record 1 manquant";
+
+    System.out.println("✓ Insert/Get All réussi\n");
   }
 
-  private static void testChar() {
-    System.out.println("Test 2: CHAR(10) with padding");
+  public static void testDeleteRecord() {
+    System.out.println("Test 2: DeleteRecord");
 
-    Column[] cols = { new Column("code", ColumnType.CHAR, 10) };
-    Relation rel = new Relation("Codes", cols);
+    // Setup
+    PageId headerPageId = dm.AllocPage();
+    ByteBuffer headerBuf = bm.GetPage(headerPageId);
+    headerBuf.putInt(0, -1);
+    headerBuf.putInt(4, -1);
+    headerBuf.putInt(8, -1);
+    headerBuf.putInt(12, -1);
+    bm.FreePage(headerPageId, true);
 
-    Record original = new Record(new Object[] { "ABC" });
-    ByteBuffer buffer = ByteBuffer.allocate(1024);
+    Column[] cols = { new Column("id", ColumnType.INT) };
+    Relation rel = new Relation("Numbers", cols, config, dm, bm, headerPageId);
 
-    rel.writeRecordToBuffer(original, buffer, 0);
+    Record r1 = new Record(new Object[] { 100 });
+    Record r2 = new Record(new Object[] { 200 });
 
-    Record read = new Record(1);
-    rel.readFromBuffer(read, buffer, 0);
+    RecordId rid1 = rel.InsertRecord(r1);
+    RecordId rid2 = rel.InsertRecord(r2);
 
-    assert read.getValue(0).equals("ABC") : "CHAR value mismatch";
+    System.out.println("Avant suppression: " + rel.GetAllRecords().size() + " records");
+    assert rel.GetAllRecords().size() == 2 : "Erreur setup";
 
-    System.out.println("✓ CHAR padding and trim successful");
-    System.out.println("  Original: " + original);
-    System.out.println("  Read:     " + read + "\n");
-  }
+    // Supprimer r1
+    rel.DeleteRecord(rid1);
+    System.out.println("Après suppression de r1: " + rel.GetAllRecords().size() + " records");
 
-  private static void testVarchar() {
-    System.out.println("Test 3: VARCHAR(20) variable length");
+    List<Record> all = rel.GetAllRecords();
+    assert all.size() == 1 : "Erreur: Delete a échoué";
+    assert all.get(0).equals(r2) : "Mauvais record supprimé";
 
-    Column[] cols = { new Column("name", ColumnType.VARCHAR, 20) };
-    Relation rel = new Relation("Users", cols);
+    // Supprimer r2 (la page devrait devenir vide et etre desallouee)
+    rel.DeleteRecord(rid2);
+    System.out.println("Après suppression de r2: " + rel.GetAllRecords().size() + " records");
+    assert rel.GetAllRecords().isEmpty() : "Erreur: Page non vidée";
 
-    Record original = new Record(new Object[] { "John Doe" });
-    ByteBuffer buffer = ByteBuffer.allocate(1024);
-
-    rel.writeRecordToBuffer(original, buffer, 0);
-
-    Record read = new Record(1);
-    rel.readFromBuffer(read, buffer, 0);
-
-    assert read.getValue(0).equals("John Doe") : "VARCHAR value mismatch";
-
-    System.out.println("✓ VARCHAR write-read successful");
-    System.out.println("  Original: " + original);
-    System.out.println("  Read:     " + read + "\n");
-  }
-
-  private static void testMixedTypes() {
-    System.out.println("Test 4: Mixed types - INT, FLOAT, CHAR, VARCHAR");
-
-    Column[] cols = { new Column("id", ColumnType.INT), new Column("salary", ColumnType.FLOAT),
-        new Column("code", ColumnType.CHAR, 5), new Column("name", ColumnType.VARCHAR, 15) };
-    Relation rel = new Relation("Employees", cols);
-
-    Record original = new Record(new Object[] { 42, 5000.50f, "EMP01", "Alice" });
-    ByteBuffer buffer = ByteBuffer.allocate(1024);
-
-    rel.writeRecordToBuffer(original, buffer, 0);
-
-    Record read = new Record(4);
-    rel.readFromBuffer(read, buffer, 0);
-
-    assert read.getValue(0).equals(42) : "INT mismatch";
-    assert Math.abs((Float) read.getValue(1) - 5000.50f) < 0.01 : "FLOAT mismatch";
-    assert read.getValue(2).equals("EMP01") : "CHAR mismatch";
-    assert read.getValue(3).equals("Alice") : "VARCHAR mismatch";
-
-    System.out.println("✓ Mixed types write-read successful");
-    System.out.println("  Original: " + original);
-    System.out.println("  Read:     " + read + "\n");
-  }
-
-  private static void testMultipleRecords() {
-    System.out.println("Test 5: Multiple records at different positions");
-
-    Column[] cols = { new Column("id", ColumnType.INT), new Column("name", ColumnType.VARCHAR, 10) };
-    Relation rel = new Relation("Items", cols);
-
-    ByteBuffer buffer = ByteBuffer.allocate(1024);
-
-    Record r1 = new Record(new Object[] { 1, "First" });
-    Record r2 = new Record(new Object[] { 2, "Second" });
-    Record r3 = new Record(new Object[] { 3, "Third" });
-
-    int recordSize = rel.getRecordSize();
-
-    rel.writeRecordToBuffer(r1, buffer, 0);
-    rel.writeRecordToBuffer(r2, buffer, recordSize);
-    rel.writeRecordToBuffer(r3, buffer, recordSize * 2);
-
-    Record read1 = new Record(2);
-    Record read2 = new Record(2);
-    Record read3 = new Record(2);
-
-    rel.readFromBuffer(read1, buffer, 0);
-    rel.readFromBuffer(read2, buffer, recordSize);
-    rel.readFromBuffer(read3, buffer, recordSize * 2);
-
-    assert read1.getValue(0).equals(1) && read1.getValue(1).equals("First");
-    assert read2.getValue(0).equals(2) && read2.getValue(1).equals("Second");
-    assert read3.getValue(0).equals(3) && read3.getValue(1).equals("Third");
-
-    System.out.println("✓ Multiple records at different positions successful");
-    System.out.println("  Record size: " + recordSize + " bytes");
-    System.out.println("  Read1: " + read1);
-    System.out.println("  Read2: " + read2);
-    System.out.println("  Read3: " + read3 + "\n");
+    System.out.println("✓ Delete réussi\n");
   }
 }
