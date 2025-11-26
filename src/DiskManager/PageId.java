@@ -1,6 +1,7 @@
 package DiskManager;
+import java.io.Serializable;
 
-public class PageId {
+public class PageId implements Serializable {
   private int fileIdx;
   private int pageIdx;
 

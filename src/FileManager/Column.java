@@ -1,6 +1,7 @@
 package FileManager;
+import java.io.Serializable;
 
-public class Column {
+public class Column implements Serializable {
   private final String columnName;
   private final ColumnType columnType;
   private final int sizeInBytes;
