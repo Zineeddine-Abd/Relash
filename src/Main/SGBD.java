@@ -1,15 +1,15 @@
 package Main;
 
 import BufferManager.BufferManager;
-import DiskManager.DiskManager;
 import DBManager.DBManager;
+import DiskManager.DiskManager;
 import DiskManager.PageId;
 import FileManager.Column;
 import FileManager.Relation;
 import java.nio.ByteBuffer;
-import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class SGBD {
 
@@ -70,7 +70,17 @@ public class SGBD {
                             ProcessDropTablesCommand();
                         }
                         break;
-                        
+                    case "DESCRIBE":
+                        if (tokens.length > 1 && tokens[1].equalsIgnoreCase("TABLE")) {
+                            ProcessDescribeTableCommand(commandLine);
+                        } else if (tokens.length > 1 && tokens[1].equalsIgnoreCase("TABLES")) {
+                            dbManager.DescribeAllTables();
+                        }
+                        break;
+                    case "EXIT":
+                        ProcessExitCommand();
+                        running = false;
+                        break;
                     default:
                         break;
                 }
@@ -160,4 +170,17 @@ public class SGBD {
         System.out.println("Toutes les tables ont été supprimées.");
     }
 
+    private void ProcessDescribeTableCommand(String command) {
+        String[] tokens = command.split("\\s+");
+        if (tokens.length < 3) return;
+        String tableName = tokens[2];
+        dbManager.DescribeTable(tableName);
+    }
+
+    private void ProcessExitCommand() {
+        dbManager.SaveState();
+        bufferManager.FlushBuffers();
+        diskManager.Finish();
+        System.out.println("Bye.");
+    }
 }
