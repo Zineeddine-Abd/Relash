@@ -293,7 +293,7 @@ public class Relation {
     return records;
   }
 
-  private List<PageId> getDataPages() {
+  public List<PageId> getDataPages() {
     List<PageId> allPages = new ArrayList<>();
     ByteBuffer headerBuff = bufferManager.GetPage(headerPageId);
     PageId freeHead = readPageIdFromBuffer(headerBuff, FREE_LIST_HEAD_OFFSET);
@@ -388,6 +388,10 @@ public class Relation {
     buffer.position(offset);
     buffer.putInt(pageId.getFileIdx());
     buffer.putInt(pageId.getPageIdx());
+  }
+
+  public PageId getHeaderPageId() {
+      return headerPageId;
   }
 
   @Override
