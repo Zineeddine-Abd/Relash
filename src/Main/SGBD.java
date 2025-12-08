@@ -6,6 +6,8 @@ import DiskManager.DiskManager;
 import DiskManager.PageId;
 import FileManager.Column;
 import FileManager.Relation;
+
+import java.io.File;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,8 +43,6 @@ public class SGBD {
     public void Run() {
         // Initialisation
         diskManager.Init();
-
-        // Chargement simple et direct
         dbManager.LoadState(diskManager, bufferManager);
 
         Scanner scanner = new Scanner(System.in);
@@ -52,7 +52,8 @@ public class SGBD {
             if (scanner.hasNextLine()) {
                 String commandLine = scanner.nextLine().trim();
 
-                if (commandLine.isEmpty()) continue;
+                if (commandLine.isEmpty())
+                    continue;
 
                 String[] tokens = commandLine.split("\\s+");
                 String firstWord = tokens[0].toUpperCase();
@@ -92,11 +93,11 @@ public class SGBD {
     private void ProcessCreateTableCommand(String command) {
         try {
             int openParenIndex = command.indexOf('(');
-            if (openParenIndex == -1) return;
+            if (openParenIndex == -1)
+                return;
 
             String beforeParen = command.substring(0, openParenIndex).trim();
-            String[] parts = beforeParen.split("\\s+");
-            String tableName = parts[parts.length - 1];
+            String tableName = beforeParen.substring("CREATE TABLE".length()).trim();
 
             int closeParenIndex = command.lastIndexOf(')');
             String columnsStr = command.substring(openParenIndex + 1, closeParenIndex);
@@ -126,7 +127,8 @@ public class SGBD {
             Relation rel = new Relation(tableName, columns, config, diskManager, bufferManager, headerPageId);
             dbManager.AddTable(rel);
 
-            System.out.println("Table " + tableName + " créée.");
+            // SUPPRIMER cette ligne selon consigne TP6 (pas d'affichage pour CREATE)
+            // System.out.println("Table " + tableName + " créée avec succès.");
 
         } catch (Exception e) {
             System.err.println("Erreur création table : " + e.getMessage());
@@ -135,7 +137,8 @@ public class SGBD {
 
     private void ProcessDropTableCommand(String command) {
         String[] tokens = command.split("\\s+");
-        if (tokens.length < 3) return;
+        if (tokens.length < 3)
+            return;
         String tableName = tokens[2];
 
         Relation rel = dbManager.GetTable(tableName);
@@ -172,7 +175,8 @@ public class SGBD {
 
     private void ProcessDescribeTableCommand(String command) {
         String[] tokens = command.split("\\s+");
-        if (tokens.length < 3) return;
+        if (tokens.length < 3)
+            return;
         String tableName = tokens[2];
         dbManager.DescribeTable(tableName);
     }

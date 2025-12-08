@@ -1,5 +1,6 @@
 package DBManager;
 
+import FileManager.ColumnType;
 import FileManager.Relation;
 import FileManager.Column;
 import DiskManager.DiskManager;
@@ -70,12 +71,23 @@ public class DBManager {
         StringBuilder sb = new StringBuilder();
         sb.append(rel.getRelationName()).append(" (");
         Column[] cols = rel.getColumns();
+
         for (int i = 0; i < cols.length; i++) {
-            sb.append(cols[i].getColumnName()).append(":").append(cols[i].getColumnType());
-            if (cols[i].getColumnType().toString().startsWith("CHAR") ||
-                    cols[i].getColumnType().toString().startsWith("VARCHAR")) {
-                sb.append("(").append(cols[i].getSizeInBytes()).append(")");
+            sb.append(cols[i].getColumnName()).append(":");
+
+            ColumnType type = cols[i].getColumnType();
+
+            // Pour CHAR et VARCHAR, afficher la taille
+            // Pour INT et FLOAT, ne PAS afficher la taille
+            if (type == ColumnType.CHAR || type == ColumnType.VARCHAR) {
+                sb.append(type.toString())
+                        .append("(")
+                        .append(cols[i].getSizeInBytes())
+                        .append(")");
+            } else {
+                sb.append(type.toString());
             }
+
             if (i < cols.length - 1) {
                 sb.append(",");
             }
@@ -103,7 +115,8 @@ public class DBManager {
     public void LoadState(DiskManager dm, BufferManager bm) {
         String savePath = config.getDbPath() + File.separator + "tables.save";
         File file = new File(savePath);
-        if (!file.exists()) return;
+        if (!file.exists())
+            return;
 
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
             int tableCount = ois.readInt();
