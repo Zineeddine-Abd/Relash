@@ -2,6 +2,8 @@
 rm -rf bin
 mkdir bin
 
+# Compilation de tous les fichiers .java trouvés dans src
 javac -d bin $(find src -name "*.java")
 
-java -cp bin Main
+# Lancement du point d'entrée correct : Package Main, Classe SGBD
+java -cp bin Main.SGBD

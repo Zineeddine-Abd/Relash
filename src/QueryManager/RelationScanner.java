@@ -66,7 +66,7 @@ public class RelationScanner implements IRecordIterator {
                     rec.setRid(new RecordId(pid, currentSlotIdx));
 
                     bm.FreePage(pid, false);
-                    currentSlotIdx++
+                    currentSlotIdx++;
                     return rec;
                 }
                 currentSlotIdx++;
