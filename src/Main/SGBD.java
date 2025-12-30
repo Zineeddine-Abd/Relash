@@ -341,9 +341,11 @@ public class SGBD {
                 toDelete.add(rec.getRid());
             }
 
-            for (RecordId rid : toDelete) {
-                rel.DeleteRecord(rid);
+            // a l'inverse pour évité les problèmes d'index ou de désallocation séquentielle sur une même page
+            for (int i = toDelete.size() - 1; i >= 0; i--) {
+                rel.DeleteRecord(toDelete.get(i));
             }
+
             System.out.println("Total deleted records=" + toDelete.size());
 
         } catch (Exception e) {

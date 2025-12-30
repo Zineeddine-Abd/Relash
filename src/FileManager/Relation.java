@@ -281,6 +281,10 @@ public class Relation {
         return allPages;
     }
 
+    public int getRecordsOffset() {
+        return RECORDS_OFFSET;
+    }
+
     private void traverseList(PageId head, List<PageId> results) {
         PageId currentId = head;
         while (!currentId.equals(DUMMY_PAGE_ID)) {

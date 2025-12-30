@@ -58,8 +58,7 @@ public class RelationScanner implements IRecordIterator {
                     // Note: Relation has a helper for this offset calculation but it's private.
                     // Recomputing based on Relation logic:
                     // Header(16) + Bytemap(slots)
-                    int recordsStartOffset = 16 + slotsPerPage;
-                    int pos = recordsStartOffset + (currentSlotIdx * relation.getRecordSize());
+                    int pos = relation.getRecordsOffset() + (currentSlotIdx * relation.getRecordSize());
 
                     Record rec = new Record(relation.getColumns().length);
                     relation.readFromBuffer(rec, buff, pos);
