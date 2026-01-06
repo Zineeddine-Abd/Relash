@@ -18,7 +18,6 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-import java.util.StringTokenizer;
 
 public class SGBD {
 
@@ -107,8 +106,6 @@ public class SGBD {
         scanner.close();
     }
 
-    // --- Commandes TP1-TP6 ---
-
     private void ProcessCreateTableCommand(String command) {
         try {
             int openParenIndex = command.indexOf('(');
@@ -156,7 +153,6 @@ public class SGBD {
             for (PageId pid : rel.getDataPages()) diskManager.DeallocPage(pid);
             diskManager.DeallocPage(rel.getHeaderPageId());
             dbManager.RemoveTable(tableName);
-            System.out.println("Table " + tableName + " supprimée.");
         }
     }
 
@@ -176,8 +172,6 @@ public class SGBD {
         if(tokens.length < 3) return;
         dbManager.DescribeTable(tokens[2]);
     }
-
-    // --- Commandes TP7 ---
 
     // INSERT INTO NomRel VALUES (v1, v2...)
     private void ProcessInsertCommand(String command) {
@@ -200,7 +194,6 @@ public class SGBD {
             }
 
             rel.InsertRecord(record);
-            System.out.println("Record inséré.");
 
         } catch (Exception e) {
             System.err.println("Erreur INSERT: " + e.getMessage());
@@ -240,10 +233,10 @@ public class SGBD {
                 count++;
             }
             br.close();
-            System.out.println("Records ajoutés: " + count);
+            System.out.println("Records ajoutés : " + count);
 
         } catch (Exception e) {
-            System.err.println("Erreur APPEND: " + e.getMessage());
+            System.err.println("Erreur APPEND : " + e.getMessage());
         }
     }
 
@@ -264,7 +257,6 @@ public class SGBD {
     // SELECT ... FROM ... WHERE ...
     private void ProcessSelectCommand(String command) {
         try {
-            // Parsing simplifié
             int fromIdx = command.toUpperCase().indexOf(" FROM ");
             if (fromIdx == -1) return;
 
@@ -275,7 +267,6 @@ public class SGBD {
             String fromPart = (whereIdx == -1) ? rest : rest.substring(0, whereIdx).trim();
             String wherePart = (whereIdx == -1) ? null : rest.substring(whereIdx + " WHERE ".length()).trim();
 
-            // FROM Part: "Table Alias"
             String[] tableAlias = fromPart.split("\\s+");
             String tableName = tableAlias[0];
             String alias = (tableAlias.length > 1) ? tableAlias[1] : "";
@@ -346,7 +337,7 @@ public class SGBD {
                 rel.DeleteRecord(toDelete.get(i));
             }
 
-            System.out.println("Total deleted records=" + toDelete.size());
+            System.out.println("Total deleted records = " + toDelete.size());
 
         } catch (Exception e) {
             System.err.println("Erreur DELETE: " + e.getMessage());
@@ -408,7 +399,7 @@ public class SGBD {
                 rel.updateRecord(r.getRid(), r);
                 count++;
             }
-            System.out.println("Total updated records=" + count);
+            System.out.println("Total updated records = " + count);
 
         } catch (Exception e) {
             System.err.println("Erreur UPDATE: " + e.getMessage());
@@ -437,7 +428,7 @@ public class SGBD {
             String left = parts[0].trim();
             String right = parts[1].trim();
 
-            if (left.contains(".")) left = left.split("\\.")[1]; // Remove alias
+            if (left.contains(".")) left = left.split("\\.")[1];
 
             int colLeft = rel.getColumnIndex(left);
             ColumnType type = rel.getColumns()[colLeft].getColumnType();
@@ -459,6 +450,6 @@ public class SGBD {
         dbManager.SaveState();
         bufferManager.FlushBuffers();
         diskManager.Finish();
-        System.out.println("Bye.");
+        System.out.println("Relash Terminated.");
     }
 }

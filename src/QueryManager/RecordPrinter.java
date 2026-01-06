@@ -17,6 +17,6 @@ public class RecordPrinter {
             System.out.println(rec.toString() + ".");
             count++;
         }
-        System.out.println("Total selected records=" + count);
+        System.out.println("Total selected records = " + count);
     }
 }
