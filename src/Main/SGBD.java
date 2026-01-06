@@ -56,7 +56,8 @@ public class SGBD {
         while (running) {
             if (scanner.hasNextLine()) {
                 String commandLine = scanner.nextLine().trim();
-                if (commandLine.isEmpty()) continue;
+                if (commandLine.isEmpty())
+                    continue;
 
                 String[] tokens = commandLine.split("\\s+");
                 String firstWord = tokens[0].toUpperCase();
@@ -109,7 +110,8 @@ public class SGBD {
     private void ProcessCreateTableCommand(String command) {
         try {
             int openParenIndex = command.indexOf('(');
-            if (openParenIndex == -1) return;
+            if (openParenIndex == -1)
+                return;
 
             String beforeParen = command.substring(0, openParenIndex).trim();
             String tableName = beforeParen.substring("CREATE TABLE".length()).trim();
@@ -146,11 +148,13 @@ public class SGBD {
 
     private void ProcessDropTableCommand(String command) {
         String[] tokens = command.split("\\s+");
-        if (tokens.length < 3) return;
+        if (tokens.length < 3)
+            return;
         String tableName = tokens[2];
         Relation rel = dbManager.GetTable(tableName);
         if (rel != null) {
-            for (PageId pid : rel.getDataPages()) diskManager.DeallocPage(pid);
+            for (PageId pid : rel.getDataPages())
+                diskManager.DeallocPage(pid);
             diskManager.DeallocPage(rel.getHeaderPageId());
             dbManager.RemoveTable(tableName);
         }
@@ -160,7 +164,8 @@ public class SGBD {
         for (String tableName : dbManager.GetTableNames()) {
             Relation rel = dbManager.GetTable(tableName);
             if (rel != null) {
-                for (PageId pid : rel.getDataPages()) diskManager.DeallocPage(pid);
+                for (PageId pid : rel.getDataPages())
+                    diskManager.DeallocPage(pid);
                 diskManager.DeallocPage(rel.getHeaderPageId());
             }
         }
@@ -169,7 +174,8 @@ public class SGBD {
 
     private void ProcessDescribeTableCommand(String command) {
         String[] tokens = command.split("\\s+");
-        if(tokens.length < 3) return;
+        if (tokens.length < 3)
+            return;
         dbManager.DescribeTable(tokens[2]);
     }
 
@@ -184,12 +190,15 @@ public class SGBD {
             valuesPart = valuesPart.substring(1, valuesPart.length() - 1); // enlever ()
 
             Relation rel = dbManager.GetTable(tableName);
-            if (rel == null) { System.out.println("Table inconnue"); return; }
+            if (rel == null) {
+                System.out.println("Table inconnue");
+                return;
+            }
 
             String[] rawValues = valuesPart.split(",");
             Record record = new Record(rel.getColumns().length);
 
-            for(int i=0; i<rawValues.length; i++) {
+            for (int i = 0; i < rawValues.length; i++) {
                 parseAndSetRecordValue(record, i, rawValues[i].trim(), rel.getColumns()[i].getColumnType());
             }
 
@@ -211,7 +220,8 @@ public class SGBD {
             filePart = filePart.substring(1, filePart.length() - 1); // enlever ()
 
             Relation rel = dbManager.GetTable(tableName);
-            if (rel == null) return;
+            if (rel == null)
+                return;
 
             File csvFile = new File(filePart);
             if (!csvFile.exists()) {
@@ -223,10 +233,11 @@ public class SGBD {
             String line;
             int count = 0;
             while ((line = br.readLine()) != null) {
-                if (line.trim().isEmpty()) continue;
+                if (line.trim().isEmpty())
+                    continue;
                 String[] parts = line.split(",");
                 Record record = new Record(rel.getColumns().length);
-                for (int i=0; i<parts.length; i++) {
+                for (int i = 0; i < parts.length; i++) {
                     parseAndSetRecordValue(record, i, parts[i].trim(), rel.getColumns()[i].getColumnType());
                 }
                 rel.InsertRecord(record);
@@ -242,12 +253,16 @@ public class SGBD {
 
     private void parseAndSetRecordValue(Record rec, int index, String val, ColumnType type) {
         switch (type) {
-            case INT: rec.setValue(index, Integer.parseInt(val)); break;
-            case FLOAT: rec.setValue(index, Float.parseFloat(val)); break;
+            case INT:
+                rec.setValue(index, Integer.parseInt(val));
+                break;
+            case FLOAT:
+                rec.setValue(index, Float.parseFloat(val));
+                break;
             case CHAR:
             case VARCHAR:
                 if (val.startsWith("\"") && val.endsWith("\"")) {
-                    val = val.substring(1, val.length()-1);
+                    val = val.substring(1, val.length() - 1);
                 }
                 rec.setValue(index, val);
                 break;
@@ -258,7 +273,8 @@ public class SGBD {
     private void ProcessSelectCommand(String command) {
         try {
             int fromIdx = command.toUpperCase().indexOf(" FROM ");
-            if (fromIdx == -1) return;
+            if (fromIdx == -1)
+                return;
 
             String selectPart = command.substring("SELECT".length(), fromIdx).trim();
             String rest = command.substring(fromIdx + " FROM ".length()).trim();
@@ -272,7 +288,10 @@ public class SGBD {
             String alias = (tableAlias.length > 1) ? tableAlias[1] : "";
 
             Relation rel = dbManager.GetTable(tableName);
-            if (rel == null) { System.out.println("Table inconnue"); return; }
+            if (rel == null) {
+                System.out.println("Table inconnue");
+                return;
+            }
 
             // Construire l'itérateur de base
             IRecordIterator iterator = new RelationScanner(rel, bufferManager);
@@ -289,9 +308,11 @@ public class SGBD {
                 String[] cols = selectPart.split(",");
                 for (String col : cols) {
                     col = col.trim();
-                    if (col.contains(".")) col = col.split("\\.")[1]; // remove alias
+                    if (col.contains("."))
+                        col = col.split("\\.")[1]; // remove alias
                     int idx = rel.getColumnIndex(col);
-                    if (idx != -1) projIndices.add(idx);
+                    if (idx != -1)
+                        projIndices.add(idx);
                 }
                 iterator = new ProjectOperator(iterator, projIndices);
             }
@@ -318,7 +339,8 @@ public class SGBD {
             String alias = (tableAlias.length > 1) ? tableAlias[1] : "";
 
             Relation rel = dbManager.GetTable(tableName);
-            if (rel == null) return;
+            if (rel == null)
+                return;
 
             IRecordIterator iterator = new RelationScanner(rel, bufferManager);
             if (wherePart != null) {
@@ -332,7 +354,8 @@ public class SGBD {
                 toDelete.add(rec.getRid());
             }
 
-            // a l'inverse pour évité les problèmes d'index ou de désallocation séquentielle sur une même page
+            // a l'inverse pour évité les problèmes d'index ou de désallocation séquentielle
+            // sur une même page
             for (int i = toDelete.size() - 1; i >= 0; i--) {
                 rel.DeleteRecord(toDelete.get(i));
             }
@@ -361,7 +384,8 @@ public class SGBD {
             String alias = (tableAlias.length > 1) ? tableAlias[1] : "";
 
             Relation rel = dbManager.GetTable(tableName);
-            if (rel == null) return;
+            if (rel == null)
+                return;
 
             // Parsing SET clause
             String[] updates = setPart.split(",");
@@ -371,7 +395,8 @@ public class SGBD {
             for (String up : updates) {
                 String[] kv = up.split("=");
                 String col = kv[0].trim();
-                if (col.contains(".")) col = col.split("\\.")[1];
+                if (col.contains("."))
+                    col = col.split("\\.")[1];
                 updateCols.add(rel.getColumnIndex(col));
                 updateVals.add(kv[1].trim());
             }
@@ -391,7 +416,7 @@ public class SGBD {
 
             for (Record r : recordsToUpdate) {
                 // Appliquer les modifs
-                for (int i=0; i<updateCols.size(); i++) {
+                for (int i = 0; i < updateCols.size(); i++) {
                     int colIdx = updateCols.get(i);
                     String valStr = updateVals.get(i);
                     parseAndSetRecordValue(r, colIdx, valStr, rel.getColumns()[colIdx].getColumnType());
@@ -415,20 +440,28 @@ public class SGBD {
             c = c.trim();
             // Trouver l'opérateur
             String op = "";
-            if (c.contains("<=")) op = "<=";
-            else if (c.contains(">=")) op = ">=";
-            else if (c.contains("<>")) op = "<>";
-            else if (c.contains("=")) op = "=";
-            else if (c.contains("<")) op = "<";
-            else if (c.contains(">")) op = ">";
+            if (c.contains("<="))
+                op = "<=";
+            else if (c.contains(">="))
+                op = ">=";
+            else if (c.contains("<>"))
+                op = "<>";
+            else if (c.contains("="))
+                op = "=";
+            else if (c.contains("<"))
+                op = "<";
+            else if (c.contains(">"))
+                op = ">";
 
-            if (op.isEmpty()) continue;
+            if (op.isEmpty())
+                continue;
 
             String[] parts = c.split(op);
             String left = parts[0].trim();
             String right = parts[1].trim();
 
-            if (left.contains(".")) left = left.split("\\.")[1];
+            if (left.contains("."))
+                left = left.split("\\.")[1];
 
             int colLeft = rel.getColumnIndex(left);
             ColumnType type = rel.getColumns()[colLeft].getColumnType();
@@ -450,6 +483,5 @@ public class SGBD {
         dbManager.SaveState();
         bufferManager.FlushBuffers();
         diskManager.Finish();
-        System.out.println("Relash Terminated.");
     }
 }
