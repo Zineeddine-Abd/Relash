@@ -13,7 +13,7 @@ public class RecordPrinter {
         int count = 0;
         Record rec;
         while ((rec = iterator.GetNextRecord()) != null) {
-            System.out.println(rec.toString() + ".");
+            System.out.println(rec.toString());
             count++;
         }
         System.out.println("Total selected records = " + count);

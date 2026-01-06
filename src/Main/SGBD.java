@@ -244,7 +244,6 @@ public class SGBD {
                 count++;
             }
             br.close();
-            System.out.println("Records ajoutés : " + count);
 
         } catch (Exception e) {
             System.err.println("Erreur APPEND : " + e.getMessage());
