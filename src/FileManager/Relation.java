@@ -53,8 +53,6 @@ public class Relation {
         return size;
     }
 
-    // --- Méthodes TP7 ---
-
     // Met à jour un record existant (sans changer son RID)
     public void updateRecord(RecordId rid, Record newRecord) {
         PageId pageId = rid.getPageId();
@@ -78,8 +76,6 @@ public class Relation {
         }
         return -1;
     }
-
-    // --------------------
 
     public String getRelationName() { return relationName; }
     public Column[] getColumns() { return Arrays.copyOf(columns, columns.length); }
@@ -259,7 +255,6 @@ public class Relation {
                 int pos = RECORDS_OFFSET + (i * recordSize);
                 Record rec = new Record(columns.length);
                 readFromBuffer(rec, pageBuff, pos);
-                // Important TP7 : Attacher le RID au record
                 rec.setRid(new RecordId(pageId, i));
                 records.add(rec);
             }
@@ -290,8 +285,15 @@ public class Relation {
         while (!currentId.equals(DUMMY_PAGE_ID)) {
             results.add(currentId);
             ByteBuffer currentBuff = bufferManager.GetPage(currentId);
-            currentId = readPageIdFromBuffer(currentBuff, NEXT_PAGE_ID_OFFSET);
+
+            // Lire l'ID de la prochaine page et le stocker temporairement
+            PageId nextId = readPageIdFromBuffer(currentBuff, NEXT_PAGE_ID_OFFSET);
+
+            // Libérer la page courante (celle qu'on a actuellement)
             bufferManager.FreePage(currentId, false);
+
+            // Mettre à jour currentId pour la prochaine iteration de la boucle
+            currentId = nextId;
         }
     }
 

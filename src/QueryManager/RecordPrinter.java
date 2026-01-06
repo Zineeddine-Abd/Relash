@@ -13,7 +13,6 @@ public class RecordPrinter {
         int count = 0;
         Record rec;
         while ((rec = iterator.GetNextRecord()) != null) {
-            // Affichage format: val1 ; val2 .
             System.out.println(rec.toString() + ".");
             count++;
         }

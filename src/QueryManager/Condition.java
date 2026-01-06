@@ -10,7 +10,7 @@ public class Condition {
     private String valConst; // Stocké en String, converti à la volée
     private int colIndexRight; // Si comparaison col vs col, sinon -1
     private boolean isRightConstant;
-    private ColumnType type; // Type de la colonne de gauche (pour le casting)
+    private ColumnType type; // Type de la colonne de gauche (juste pour le casting)
 
     public Condition(int colIndex, String operator, String valConst, ColumnType type) {
         this.colIndex = colIndex;

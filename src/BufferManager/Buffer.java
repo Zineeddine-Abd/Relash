@@ -83,6 +83,6 @@ public class Buffer {
         this.dirty = false;
         this.lastAccessTime = 0;
         this.valid = false;
-        this.data.clear(); // pos=0 and lim=capacity.
+        this.data.clear();
     }
 }

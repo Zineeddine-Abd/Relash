@@ -434,46 +434,59 @@ public class SGBD {
     // Helper pour parser les conditions
     private List<Condition> parseConditions(String wherePart, Relation rel, String alias) {
         List<Condition> conditions = new ArrayList<>();
+        // Séparation des différentes conditions combinées par AND
         String[] condsStr = wherePart.split(" AND ");
 
         for (String c : condsStr) {
             c = c.trim();
-            // Trouver l'opérateur
+            // Identification de l'opérateur de comparaison
             String op = "";
-            if (c.contains("<="))
-                op = "<=";
-            else if (c.contains(">="))
-                op = ">=";
-            else if (c.contains("<>"))
-                op = "<>";
-            else if (c.contains("="))
-                op = "=";
-            else if (c.contains("<"))
-                op = "<";
-            else if (c.contains(">"))
-                op = ">";
+            if (c.contains("<=")) op = "<=";
+            else if (c.contains(">=")) op = ">=";
+            else if (c.contains("<>")) op = "<>";
+            else if (c.contains("=")) op = "=";
+            else if (c.contains("<")) op = "<";
+            else if (c.contains(">")) op = ">";
 
-            if (op.isEmpty())
-                continue;
+            if (op.isEmpty()) continue;
 
+            // Découpage entre la partie gauche et droite de l'opérateur
             String[] parts = c.split(op);
             String left = parts[0].trim();
             String right = parts[1].trim();
 
-            if (left.contains("."))
-                left = left.split("\\.")[1];
+            // Nettoyage des alias (par ex: t.nom -> nom)
+            String cleanLeft = left.contains(".") ? left.split("\\.")[1] : left;
+            String cleanRight = right.contains(".") ? right.split("\\.")[1] : right;
 
-            int colLeft = rel.getColumnIndex(left);
-            ColumnType type = rel.getColumns()[colLeft].getColumnType();
+            // On cherche l'index de la colonne pour les deux côtés
+            int colIdxL = rel.getColumnIndex(cleanLeft);
+            int colIdxR = rel.getColumnIndex(cleanRight);
 
-            // Vérifier si droite est colonne ou valeur
-            boolean rightIsCol = right.contains(alias + ".");
-            if (rightIsCol) {
-                String rightColName = right.split("\\.")[1];
-                int colRight = rel.getColumnIndex(rightColName);
-                conditions.add(new Condition(colLeft, op, colRight, type));
-            } else {
-                conditions.add(new Condition(colLeft, op, right, type));
+            if (colIdxL != -1 && colIdxR != -1) {
+                // Cas 1 : Comparaison Colonne vs Colonne (par ex: r.C1 <= r.C4)
+                ColumnType type = rel.getColumns()[colIdxL].getColumnType();
+                conditions.add(new Condition(colIdxL, op, colIdxR, type));
+            }
+            else if (colIdxL != -1) {
+                // Cas 2 : Colonne à gauche, Constante à droite (par ex: r.C1 < 630)
+                ColumnType type = rel.getColumns()[colIdxL].getColumnType();
+                conditions.add(new Condition(colIdxL, op, right, type));
+            }
+            else if (colIdxR != -1) {
+                // Cas 3 : Constante à gauche, Colonne à droite (pa ex: 89 >= r.C5)
+                // On inverse l'opérateur pour transformer la condition en (Colonne OP_INVERSÉ Constante)
+                ColumnType type = rel.getColumns()[colIdxR].getColumnType();
+                String flippedOp = op;
+                switch (op) {
+                    case "<":  flippedOp = ">";  break;
+                    case ">":  flippedOp = "<";  break;
+                    case "<=": flippedOp = ">="; break;
+                    case ">=": flippedOp = "<="; break;
+                    // = et <> restent identiques
+                }
+                // On ajoute la condition en utilisant l'index de la colonne de droite et la valeur de gauche
+                conditions.add(new Condition(colIdxR, flippedOp, left, type));
             }
         }
         return conditions;

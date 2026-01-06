@@ -14,7 +14,6 @@ public class Record {
         this.values = Arrays.copyOf(values, values.length);
     }
 
-    // --- Ajout TP7 ---
     public void setRid(RecordId rid) {
         this.rid = rid;
     }
@@ -22,7 +21,6 @@ public class Record {
     public RecordId getRid() {
         return rid;
     }
-    // ----------------
 
     public Object getValue(int index) {
         if (index < 0 || index >= values.length) {
@@ -44,7 +42,6 @@ public class Record {
 
     @Override
     public String toString() {
-        // Format demandé TP7 : val1 ; val2 ; ... .
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < values.length; i++) {
             sb.append(values[i]);

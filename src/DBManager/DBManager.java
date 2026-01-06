@@ -77,8 +77,6 @@ public class DBManager {
 
             ColumnType type = cols[i].getColumnType();
 
-            // Pour CHAR et VARCHAR, afficher la taille
-            // Pour INT et FLOAT, ne PAS afficher la taille
             if (type == ColumnType.CHAR || type == ColumnType.VARCHAR) {
                 sb.append(type.toString())
                         .append("(")
@@ -115,7 +113,7 @@ public class DBManager {
     public void LoadState(DiskManager dm, BufferManager bm) {
         String savePath = config.getDbPath() + File.separator + "tables.save";
         File file = new File(savePath);
-        if (!file.exists())
+        if (!file.exists() || file.length() == 0)
             return;
 
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
