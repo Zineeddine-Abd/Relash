@@ -1,12 +1,22 @@
 ========================================================================
                       CONFIGURATION BIG DATA & NOTES
 ========================================================================
+1. EMPLACEMENT DES FICHIERS CSV
+------------------------------------------------------------------------
+Pour utiliser la commande d'importation :
+   APPEND INTO <Table> ALLRECORDS (<Fichier.csv>)
 
-1. CONFIGURATION "BIG DATA"
+IMPORTANT : Les fichiers .csv doit IMPÉRATIVEMENT être placé à la RACINE 
+du projet (au même niveau que le dossier 'src', 'bin' et les scripts 
+'run.bat'/'run.sh').
+
+Le programme ne cherche pas les fichiers dans des sous-dossiers.
+
+
+2. CONFIGURATION "BIG DATA"
 ------------------------------------------------------------------------
 Les valeurs suivantes ont été spécifiquement choisies dans le fichier 
-config/dbconfig.json pour garantir la performance et la stabilité du 
-SGBD lors du traitement de gros volumes de données (Scénarios Big Data) :
+config/dbconfig.json pour garantir le Scénario Big Data :
 
 {
   "dbpath": "data",
@@ -57,17 +67,6 @@ JUSTIFICATION DES CHOIX :
 - dm_maxfilecount & dm_maxpagesperfile : Ces limites élevées assurent 
   une capacité de stockage virtuel quasi-illimitée pour les besoins 
   du projet, évitant les erreurs "Disque Plein" lors d'insertions massives.
-
-2. EMPLACEMENT DES FICHIERS CSV
-------------------------------------------------------------------------
-Pour utiliser la commande d'importation :
-   APPEND INTO <Table> ALLRECORDS (<Fichier.csv>)
-
-IMPORTANT : Le fichier .csv doit IMPÉRATIVEMENT être placé à la RACINE 
-du projet (au même niveau que le dossier 'src', 'bin' et les scripts 
-'run.bat'/'run.sh').
-
-Le programme ne cherche pas les fichiers dans des sous-dossiers.
 
 3. COMPILATION ET EXÉCUTION
 ------------------------------------------------------------------------
