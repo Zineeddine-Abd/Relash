@@ -1,9 +1,6 @@
-# Nettoyer l'ancien dossier bin si existe
 rm -rf bin
 mkdir bin
 
-# Compilation de tous les fichiers .java trouvés dans src
-javac -d bin $(find src -name "*.java")
+javac -d bin -encoding UTF-8 src/Main/*.java src/BufferManager/*.java src/DBManager/*.java src/DiskManager/*.java src/FileManager/*.java src/QueryManager/*.java
 
-# Lancement du point d'entrée correct : Package Main, Classe SGBD
 java -cp bin Main.SGBD
