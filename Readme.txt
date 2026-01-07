@@ -68,3 +68,18 @@ du projet (au même niveau que le dossier 'src', 'bin' et les scripts
 'run.bat'/'run.sh').
 
 Le programme ne cherche pas les fichiers dans des sous-dossiers.
+
+3. COMPILATION ET EXÉCUTION
+------------------------------------------------------------------------
+Des scripts sont fournis pour simplifier la compilation et l'exécution 
+du projet.
+
+SOUS WINDOWS :
+Double-cliquez sur le fichier 'run.bat' ou lancez la commande suivante 
+dans un terminal (CMD ou PowerShell) :
+   .\run.bat
+
+SOUS LINUX / MACOS :
+Il faut d'abord donner les droits d'exécution au script, puis le lancer :
+   chmod +x run.sh
+   ./run.sh
