@@ -1,6 +1,6 @@
-Markdown
+![Banner](./Relash_Github_Header.png)
 
-# Mini SGBD - Projet BDD Avancées
+# Relash - Mini SGBD - Projet BDD Avancées
 
 Ce projet implémente un Système de Gestion de Base de Données (SGBD) relationnel simplifié en **Java**, partant de la gestion bas niveau (Disque/Buffer) jusqu'au moteur d'exécution de requêtes SQL.
 
